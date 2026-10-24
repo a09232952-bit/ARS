@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz – Administration Réseau & Systèmes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🖧</span>
+      <div>
+        <h1>Quiz Administration Réseau &amp; Systèmes</h1>
+        <p>UASZ · Dr Malaw NDIAYE · 2025-2026</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ÉCRAN 1 : CONFIGURATION -->
+    <section id="screen-setup" class="card screen">
+      <h2>Configurer votre quiz</h2>
+      <p class="muted">Chaque question dure <strong>30 secondes</strong>. Choisissez les chapitres et le nombre de questions.</p>
+
+      <fieldset class="field">
+        <legend>Chapitres</legend>
+        <div id="chapter-list" class="chapters"></div>
+      </fieldset>
+
+      <div class="field">
+        <label for="nb-range">Nombre de questions : <strong id="nb-value">20</strong> <span class="muted" id="nb-max"></span></label>
+        <input type="range" id="nb-range" min="1" max="20" value="20">
+        <div class="row">
+          <input type="number" id="nb-number" min="1" max="20" value="20">
+          <button type="button" class="btn ghost" id="btn-max">Maximum</button>
+          <button type="button" class="btn ghost" id="btn-10">10</button>
+          <button type="button" class="btn ghost" id="btn-20">20</button>
+          <button type="button" class="btn ghost" id="btn-50">50</button>
+        </div>
+      </div>
+
+      <label class="check"><input type="checkbox" id="opt-shuffle" checked> Mélanger les questions et les réponses</label>
+
+      <p class="muted small" id="setup-estimate"></p>
+      <div id="setup-error" class="error" hidden></div>
+
+      <button class="btn primary big" id="btn-start">Commencer le quiz ▶</button>
+    </section>
+
+    <!-- ÉCRAN 2 : QUIZ -->
+    <section id="screen-quiz" class="card screen" hidden>
+      <div class="quiz-head">
+        <div>
+          <span class="badge" id="q-chapter"></span>
+          <div class="progress-text">Question <strong id="q-index">1</strong> / <span id="q-total">10</span></div>
+        </div>
+        <div class="timer" id="timer" role="timer" aria-live="off">
+          <svg viewBox="0 0 64 64" width="72" height="72">
+            <circle class="ring-bg" cx="32" cy="32" r="28"></circle>
+            <circle class="ring" id="ring" cx="32" cy="32" r="28"></circle>
+          </svg>
+          <span id="timer-text">30</span>
+        </div>
+        <div class="score-box">Score<br><strong id="live-score">0</strong></div>
+      </div>
+
+      <div class="bar"><div class="bar-fill" id="progress-fill"></div></div>
+
+      <h2 id="q-text" class="question"></h2>
+      <div id="answers" class="answers"></div>
+
+      <div id="feedback" class="feedback" hidden>
+        <p id="feedback-title"></p>
+        <p id="feedback-expl" class="muted"></p>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" id="btn-quit">Abandonner</button>
+        <button class="btn primary" id="btn-next" hidden>Suivante ▶</button>
+      </div>
+      <p class="muted small hint">Raccourcis : touches 1-4 (ou A-D) pour répondre · Entrée pour continuer</p>
+    </section>
+
+    <!-- ÉCRAN 3 : RÉSULTATS -->
+    <section id="screen-result" class="card screen" hidden>
+      <h2>Résultats</h2>
+      <div class="result-top">
+        <div class="big-score"><span id="res-percent">0</span>%</div>
+        <div>
+          <p id="res-message" class="res-message"></p>
+          <p class="muted"><strong id="res-correct">0</strong> bonnes réponses sur <strong id="res-total">0</strong>
+            · <span id="res-wrong">0</span> erreurs · <span id="res-timeout">0</span> temps écoulés</p>
+          <p class="muted">Temps moyen par question : <strong id="res-avg">0</strong> s</p>
+        </div>
+      </div>
+
+      <h3>Par chapitre</h3>
+      <div id="res-chapters" class="res-chapters"></div>
+
+      <h3>Revue des erreurs</h3>
+      <div id="res-review" class="review"></div>
+
+      <div class="actions">
+        <button class="btn ghost" id="btn-newquiz">Nouveau réglage</button>
+        <button class="btn primary" id="btn-replay">Rejouer ↻</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">Basé sur les cours : Introduction aux OS réseau · Services d'infrastructure (DNS, DHCP, NTP) · Services de partage et d'application</footer>
+
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
