@@ -168,6 +168,17 @@ input[type=number] {
 .actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
 .hint { text-align: center; margin-bottom: 0; }
 
+.tp-heading, .tp-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tp-heading { margin-bottom: 18px; }
+.tp-heading h2 { margin: 0; }
+.tp-list { display: grid; gap: 14px; }
+.tp-item { border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 16px; border-radius: 8px; }
+.tp-item h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.tp-item p { margin: 0 0 10px; color: var(--muted); }
+.tp-objectives { display: flex; flex-wrap: wrap; gap: 6px 24px; padding-left: 20px; margin: 0 0 14px; }
+.tp-actions { justify-content: flex-start; flex-wrap: wrap; }
+.tp-actions a { text-decoration: none; }
+
 /* Résultats */
 .result-top { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
 .big-score {
@@ -198,4 +209,5 @@ input[type=number] {
   .card { padding: 18px; }
   .quiz-head { flex-wrap: wrap; }
   .question { font-size: 1.05rem; }
+  .tp-heading { align-items: flex-start; flex-direction: column; }
 }

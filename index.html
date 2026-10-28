@@ -47,6 +47,7 @@
       <div id="setup-error" class="error" hidden></div>
 
       <button class="btn primary big" id="btn-start">Commencer le quiz ▶</button>
+      <button class="btn ghost big" id="btn-show-tp">Voir les rubriques TP</button>
     </section>
 
     <!-- ÉCRAN 2 : QUIZ -->
@@ -106,6 +107,15 @@
         <button class="btn ghost" id="btn-newquiz">Nouveau réglage</button>
         <button class="btn primary" id="btn-replay">Rejouer ↻</button>
       </div>
+    </section>
+
+    <!-- ÉCRAN 4 : RUBRIQUES DES PDF TP -->
+    <section id="screen-tp" class="card screen" hidden>
+      <div class="tp-heading">
+        <h2>Rubriques des travaux pratiques</h2>
+        <button class="btn ghost" id="btn-tp-back">Retour au quiz</button>
+      </div>
+      <div id="tp-list" class="tp-list"></div>
     </section>
 
   </main>

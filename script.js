@@ -5,7 +5,7 @@
   const RING_LEN = 2 * Math.PI * 28;
 
   const $ = (id) => document.getElementById(id);
-  const screens = { setup: $("screen-setup"), quiz: $("screen-quiz"), result: $("screen-result") };
+  const screens = { setup: $("screen-setup"), quiz: $("screen-quiz"), result: $("screen-result"), tp: $("screen-tp") };
 
   // ----- État -----
   let selectedChapters = new Set(Object.keys(CHAPTERS).map(Number));
@@ -17,6 +17,7 @@
   let timerId = null;
   let startTs = 0;
   let locked = false;
+  let activeTP = null;
 
   // ----- Utilitaires -----
   function shuffle(arr) {
@@ -30,6 +31,52 @@
   function show(name) {
     Object.entries(screens).forEach(([k, el]) => (el.hidden = k !== name));
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function buildTPRubrics() {
+    const box = $("tp-list");
+    box.innerHTML = "";
+    Object.entries(TP_BANK).forEach(([id, tp]) => {
+      const article = document.createElement("article");
+      article.className = "tp-item";
+
+      const title = document.createElement("h3");
+      title.textContent = tp.title;
+      const summary = document.createElement("p");
+      summary.textContent = tp.summary;
+      const objectives = document.createElement("ul");
+      objectives.className = "tp-objectives";
+      tp.objectives.forEach((objective) => {
+        const item = document.createElement("li");
+        item.textContent = objective;
+        objectives.appendChild(item);
+      });
+
+      const actions = document.createElement("div");
+      actions.className = "tp-actions";
+      const pdfLink = document.createElement("a");
+      pdfLink.className = "btn ghost";
+      pdfLink.href = tp.pdf;
+      pdfLink.target = "_blank";
+      pdfLink.rel = "noopener";
+      pdfLink.textContent = "Ouvrir le PDF";
+      const quizButton = document.createElement("button");
+      quizButton.type = "button";
+      quizButton.className = "btn primary";
+      quizButton.textContent = `Quiz (${tp.questions.length} questions)`;
+      quizButton.addEventListener("click", () => startTPQuiz(id));
+      actions.append(pdfLink, quizButton);
+
+      article.append(title, summary, objectives, actions);
+      box.appendChild(article);
+    });
+  }
+
+  function startTPQuiz(id) {
+    const tp = TP_BANK[id];
+    if (!tp) return;
+    activeTP = id;
+    startQuiz(tp.questions.map((item) => ({ ...item, label: tp.title })), tp.questions.length);
   }
   function pool() {
     return QUESTIONS.filter((x) => selectedChapters.has(x.ch));
@@ -86,11 +133,11 @@
   $("opt-shuffle").addEventListener("change", (e) => (config.shuffle = e.target.checked));
 
   // ----- Démarrage -----
-  function startQuiz() {
-    const p = pool();
+  function startQuiz(questionPool = pool(), count = config.count) {
+    const p = questionPool;
     if (!p.length) return;
     const base = config.shuffle ? shuffle(p) : p.slice();
-    quiz = base.slice(0, Math.min(config.count, base.length));
+    quiz = base.slice(0, Math.min(count, base.length));
     current = 0;
     score = 0;
     answers = [];
@@ -110,7 +157,7 @@
     item._options = options;
 
     $("q-index").textContent = current + 1;
-    $("q-chapter").textContent = CHAPTERS[item.ch];
+    $("q-chapter").textContent = item.label || CHAPTERS[item.ch];
     $("q-text").textContent = item.text;
     $("progress-fill").style.width = (current / quiz.length) * 100 + "%";
     $("feedback").hidden = true;
@@ -254,19 +301,19 @@
     // Par chapitre
     const byCh = {};
     answers.forEach((a) => {
-      const c = a.item.ch;
-      byCh[c] = byCh[c] || { ok: 0, n: 0 };
-      byCh[c].n++;
-      if (a.status === "ok") byCh[c].ok++;
+      const label = a.item.label || CHAPTERS[a.item.ch];
+      byCh[label] = byCh[label] || { ok: 0, n: 0 };
+      byCh[label].n++;
+      if (a.status === "ok") byCh[label].ok++;
     });
     const chBox = $("res-chapters");
     chBox.innerHTML = "";
-    Object.keys(byCh).sort().forEach((c) => {
-      const { ok, n } = byCh[c];
+    Object.keys(byCh).sort().forEach((label) => {
+      const { ok, n } = byCh[label];
       const p = Math.round((ok / n) * 100);
       const row = document.createElement("div");
       row.className = "res-ch";
-      row.innerHTML = `<span>${CHAPTERS[c]}</span><strong>${ok}/${n} (${p}%)</strong>
+      row.innerHTML = `<span>${label}</span><strong>${ok}/${n} (${p}%)</strong>
         <div class="bar"><div class="bar-fill" style="width:${p}%"></div></div>`;
       chBox.appendChild(row);
     });
@@ -295,7 +342,12 @@
   }
 
   // ----- Événements -----
-  $("btn-start").addEventListener("click", startQuiz);
+  $("btn-start").addEventListener("click", () => {
+    activeTP = null;
+    startQuiz();
+  });
+  $("btn-show-tp").addEventListener("click", () => show("tp"));
+  $("btn-tp-back").addEventListener("click", () => show("setup"));
   $("btn-next").addEventListener("click", next);
   $("btn-quit").addEventListener("click", () => {
     if (confirm("Abandonner le quiz en cours ?")) {
@@ -303,7 +355,7 @@
       show("setup");
     }
   });
-  $("btn-replay").addEventListener("click", startQuiz);
+  $("btn-replay").addEventListener("click", () => activeTP ? startTPQuiz(activeTP) : startQuiz());
   $("btn-newquiz").addEventListener("click", () => show("setup"));
 
   document.addEventListener("keydown", (e) => {
@@ -321,6 +373,7 @@
   // Mise en pause du chrono si l'onglet est caché : on ne triche pas, le temps continue (basé sur performance.now).
 
   // ----- Init -----
+  buildTPRubrics();
   buildChapters();
   config.count = Math.min(20, QUESTIONS.length);
   refreshCount();
